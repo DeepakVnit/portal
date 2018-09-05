@@ -13,7 +13,9 @@ urlpatterns = [
     url(r'^register/?$', appview.RegistrationAPIView.as_view(), name='register'),
     url(r'^user/?$', appview.UserRetrieveUpdateAPIView.as_view(), name='user'),
     url(r'^login/$', appview.LoginAPIView.as_view(), name='login'),
-    url(r'^profile/?$', appview.ProfileRetrieveAPIView.as_view()),
+    url(r'^accounts/profile/', appview.ProfileRetrieveAPIView.as_view()),
+
+    url(r'^auth-social/', include('social_django.urls', namespace='social')),
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api-token-auth/', obtain_jwt_token),

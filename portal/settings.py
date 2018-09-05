@@ -24,7 +24,7 @@ SECRET_KEY = 's$*rh0mw5+ky=xdvcdjeg7%i9-%su$@%w=^uieya65i*(@*&0j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'www.example.com']
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'portalapp',
+    'social_django',
     'rest_framework',
     'corsheaders',
 )
@@ -63,6 +64,8 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -88,6 +91,16 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'portalapp.exceptions.core_exception_handler',
     'NON_FIELD_ERRORS_KEY': 'error'
 }
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOpenId',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.yahoo.YahooOpenId',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -117,6 +130,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "248520527211-2kcj9b0l0amn14e1389m3qdp3ksvk8lm"
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "rVvm3Saw8w6cOgasijRf1Q9R"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -128,3 +143,4 @@ MEDIA_ROOT = 'mymedia/'
 MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'portalapp.User'
+LOGIN_REDIRECT_URL = '/accounts/profile/'

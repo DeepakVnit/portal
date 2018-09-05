@@ -11,7 +11,8 @@ from .models import Profile
 from .renderers import ProfileJSONRenderer
 from .serializers import ProfileSerializer
 from .exceptions import ProfileDoesNotExist
-
+from django.contrib.sessions.models import Session
+from .models import User
 
 class RegistrationAPIView(APIView):
     # Allow any user (authenticated or not) to hit this endpoint.
@@ -47,7 +48,8 @@ class LoginAPIView(APIView):
     serializer_class = LoginSerializer
 
     def post(self, request):
-        user = request.data.dict()
+        user = request.data
+        import pdb;pdb.set_trace()
         # Notice here that we do not call `serializer.save()` like we did for
         # the registration endpoint. This is because we don't  have
         # anything to save. Instead, the `validate` method on our serializer
@@ -104,6 +106,21 @@ class ProfileRetrieveAPIView(RetrieveAPIView):
         # profile could not be found.
         try:
             username = request.user.username
+            if not username:
+                session_key = request.session.session_key
+                if session_key:
+                    session = Session.objects.get(session_key=session_key)
+                    if not session:
+                        raise ProfileDoesNotExist
+                    else:
+                        session_data = session.get_decoded()
+                        uid = session_data.get('_auth_user_id')
+                        user = User.objects.get(id=uid)
+                        request.user = user
+                        username = user.username
+                else:
+                    raise ProfileDoesNotExist
+
             # We use the `select_related` method to avoid making unnecessary
             # database calls.
             profile = Profile.objects.select_related('user').get(
@@ -115,3 +132,19 @@ class ProfileRetrieveAPIView(RetrieveAPIView):
         serializer = self.serializer_class(profile)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# from rest_framework.decorators import api_view
+#
+# @api_view(["GET"])
+# def hello_world(request):
+#     session_key = request.session.session_key
+#     session = Session.objects.get(session_key=session_key)
+#     session_data = session.get_decoded()
+#     print session_data
+#     uid = session_data.get('_auth_user_id')
+#     user = User.objects.get(id=uid)
+#     request.user = user
+#     return Response({"message": "Hello, world!"})
+
+# 08041236694
